@@ -1,0 +1,39 @@
+# Capstone manifest — evaluator reads this to run and probe the system
+
+run: uvicorn api:app --reload
+
+seed: |
+  python vision_pipeline.py && python matching_engine.py
+
+test: |
+  python eval_precision.py && python eval_threshold.py
+
+base_url: http://127.0.0.1:8000
+
+endpoints:
+  - method: GET
+    path: /posts/{post_id}/images
+    description: Generate (or fetch existing) image suggestion for a post
+    example: /posts/1/images
+
+  - method: GET
+    path: /suggestions/{suggestion_id}
+    description: Inspect a single suggestion - why it matched or was rejected
+    example: /suggestions/1
+
+  - method: GET
+    path: /suggestions
+    description: List all suggestions, optionally filtered by status
+    example: /suggestions?status=pending
+
+  - method: POST
+    path: /suggestions/{suggestion_id}/approve
+    description: Approve a suggestion
+    example: /suggestions/1/approve
+
+  - method: POST
+    path: /suggestions/{suggestion_id}/reject
+    description: Reject a suggestion
+    example: /suggestions/1/reject
+
+docs_url: http://127.0.0.1:8000/docs
